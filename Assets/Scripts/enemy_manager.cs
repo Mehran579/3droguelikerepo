@@ -50,4 +50,12 @@ public class enemy_manager : MonoBehaviour
     {
         weapon.enabled = false;
     }
+    public void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("bullet"))
+        {
+            GetComponent<healthmanager>().takedamage(1);
+        }
+    }
+
 }

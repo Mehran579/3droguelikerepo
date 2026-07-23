@@ -1539,7 +1539,7 @@ MonoBehaviour:
   cinecamera: {fileID: 1288116669}
   holdingrailgun: 0
   firerate: 0.5
-  railguncooldown: 1.5
+  railguncooldown: 3
   coyotetime: 0.25
   inputtime: 0.25
   raycastradius: 0.2
