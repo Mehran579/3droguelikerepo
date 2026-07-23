@@ -3,7 +3,7 @@ using UnityEngine;
 public class enemy_manager : MonoBehaviour
 {
     public Collider weapon;
-    public Transform[] waypoints;
+    //public Transform[] waypoints;
     public Transform myfollowpoint;
     public float speed;
     public float attack_distance;
@@ -14,9 +14,10 @@ public class enemy_manager : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        myfollowpoint = waypoints[Random.Range(0, waypoints.Length)];
+        //myfollowpoint = waypoints[Random.Range(0, waypoints.Length)];
         anim = GetComponent<Animator>();
         player = GameObject.FindWithTag("Player");
+        myfollowpoint = player.transform.Find("way point "+Random.Range(0,6));
         transform.rotation = Quaternion.LookRotation(player.transform.position);
     }
 

@@ -45,7 +45,10 @@ public class playermanager : MonoBehaviour
         }
         if (context.performed)
         {
-            anim.SetBool("running",true);
+            if (!holdingrailgun)
+            {
+                anim.SetBool("running", true);
+            }
         }
         else
         {
@@ -133,9 +136,11 @@ public class playermanager : MonoBehaviour
     }
     public void OnRailgun(InputAction.CallbackContext context)
     {
-        if (!weapon2.activeSelf || knockedback) return; 
+        //float initialvelocity = speed;
+        if (!weapon2.activeSelf || knockedback) return;
         if (context.started)
         {
+            speed *= 0.5f;
             holdingrailgun = true;
             anim.SetBool("aiming", true);
             if (chargeloop != null) StopCoroutine(chargeloop);
@@ -143,6 +148,7 @@ public class playermanager : MonoBehaviour
         }
         if (context.canceled)
         {
+            speed *= 2;
             holdingrailgun = false;
             anim.SetBool("aiming", false);
             if (chargeloop != null)
@@ -309,6 +315,7 @@ public class playermanager : MonoBehaviour
     public bool knockedback;
     public IEnumerator knockback(float knockbacktime, float knockbackforce,Vector3 pointofcontact)
     {
+        //float initailspeed = speed;
         knockedback = true;
         Vector3 dir = transform.position - pointofcontact;
         dir.y = 0;
@@ -321,6 +328,7 @@ public class playermanager : MonoBehaviour
         yield return new WaitForSeconds(knockbacktime);
         anim.SetBool("knockback",false);
         knockedback = false;
+        //speed = initailspeed;
     }
 
 }
