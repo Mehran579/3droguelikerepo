@@ -6,6 +6,7 @@ public class enemy_manager : MonoBehaviour
     public Transform[] waypoints;
     public Transform myfollowpoint;
     public float speed;
+    public float attack_distance;
     Rigidbody rb;
     Animator anim;
     GameObject player;
@@ -25,7 +26,7 @@ public class enemy_manager : MonoBehaviour
         Vector3 dir = (player.transform.position - rb.position).normalized;
         dir.y = 0;
         rb.MoveRotation(Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir),100 * Time.fixedDeltaTime));
-        if (Vector3.Distance(transform.position, player.transform.position) < 1.5f)
+        if (Vector3.Distance(transform.position, player.transform.position) < attack_distance)
         {
             anim.SetBool("attacking", true);
         }
@@ -33,7 +34,7 @@ public class enemy_manager : MonoBehaviour
         {
             anim.SetBool("attacking", false);
         }
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Skeletons_Walking"))
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("walking"))
         {
             rb.MovePosition(Vector3.MoveTowards(transform.position, myfollowpoint.position, speed * Time.fixedDeltaTime));
         }
@@ -55,6 +56,10 @@ public class enemy_manager : MonoBehaviour
         if (other.gameObject.CompareTag("bullet"))
         {
             GetComponent<healthmanager>().takedamage(1);
+        }
+        else if (other.gameObject.CompareTag("railgunbullet"))
+        {
+            GetComponent<healthmanager>().takedamage(100);
         }
     }
 

@@ -14,7 +14,7 @@ public class healthmanager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(health == 0)
+        if(health <= 0)
         {
             Destroy(gameObject);
         }
@@ -27,7 +27,14 @@ public class healthmanager : MonoBehaviour
         {
             GameObject text = Instantiate(damageprefab, damagespawn.position + (Random.insideUnitSphere*0.2f), Quaternion.LookRotation(-GameObject.FindWithTag("Player").transform.position + transform.position));
             //text.transform.localRotation = Quaternion.LookRotation(GameObject.FindWithTag("Player").transform.position - text.transform.localPosition);
-            text.GetComponent<TextMeshPro>().text = health.ToString();
+            if (health > 0)
+            {
+                text.GetComponent<TextMeshPro>().text = health.ToString();
+            }
+            else
+            {
+                text.GetComponent<TextMeshPro>().text = "0";
+            }
             Destroy(text,1f);
         }
     }

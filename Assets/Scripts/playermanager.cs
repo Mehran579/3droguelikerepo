@@ -106,15 +106,19 @@ public class playermanager : MonoBehaviour
             }
             fovroutine = StartCoroutine(fovchanger(40f));
         }
-        if(context.canceled && !holdingrailgun)
+        if(context.canceled)
         {
-            anim.SetBool("aiming", false);
             //cinecamera.Lens.FieldOfView = 80f;
             if(fovroutine != null)
             {
                 StopCoroutine(fovroutine);
             }
             fovroutine = StartCoroutine(fovchanger(80f));
+
+            if (!holdingrailgun)
+            {
+                anim.SetBool("aiming", false);
+            }
             //StartCoroutine(fovchanger(80f));
         }
     }
