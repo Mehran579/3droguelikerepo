@@ -155,6 +155,7 @@ MonoBehaviour:
   - {fileID: 6736525564554282639, guid: 16848d3b973709c4dab07c334e8282d4, type: 3}
   - {fileID: 148745431052029694, guid: a4f0f830f85a21b45829eb643e15a9b3, type: 3}
   - {fileID: 9127858053580950080, guid: 591facf147be24f47b6f590ef2390834, type: 3}
+  player: {fileID: 0}
 --- !u!4 &19115388
 Transform:
   m_ObjectHideFlags: 0
@@ -1514,6 +1515,10 @@ MonoBehaviour:
   cinecamera: {fileID: 1288116669}
   holdingrailgun: 0
   firerate: 0.25
+  isdashing: 0
+  _Dashtime: 0.41
+  _dashvelocity: 74.85
+  _dashcooldown: 2
   railguncooldown: 3
   coyotetime: 0.25
   inputtime: 0.25
@@ -1617,7 +1622,19 @@ MonoBehaviour:
     m_ActionId: b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba
     m_ActionName: 'Player/Next[/Keyboard/2]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 621884475}
+        m_TargetAssemblyTypeName: playermanager, Assembly-CSharp
+        m_MethodName: OnDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 641cd816-40e6-41b4-8c3d-04687c349290
     m_ActionName: 'Player/Sprint[/Keyboard/leftShift]'
   - m_PersistentCalls:
@@ -3370,6 +3387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d27657b83ade247a43d9c031e18dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _hit: {fileID: 0}
   weapon: {fileID: 1057206426}
   myfollowpoint: {fileID: 0}
   speed: 1

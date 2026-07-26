@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,7 +62,7 @@ public class playermanager : MonoBehaviour
         if (knockedback) return;
         if (context.performed)
         {
-            Debug.Log($"Jump pressed. coyotetimer: {coyotetimer}");
+            //Debug.Log($"Jump pressed. coyotetimer: {coyotetimer}");
             inputtimer = inputtime;
             if (coyotetimer > 0)
             {
@@ -94,6 +95,39 @@ public class playermanager : MonoBehaviour
             firepressed = false;
         }
     }
+    public bool isdashing;
+    public float _Dashtime;
+    public float _dashvelocity;
+    public float _dashcooldown;
+    public void OnDash(InputAction.CallbackContext context)
+    {
+        if (context.performed && !isdashing)
+        {
+            StartCoroutine(DashRoutine(_Dashtime, _dashvelocity, _dashcooldown));
+        }
+    }
+    IEnumerator DashRoutine(float dashtime,float dashvelocity, float dashcooldown)
+    {
+        isdashing = true;
+        yield return new WaitForSeconds(0.024f);
+        rb.useGravity = false;
+        Physics.IgnoreLayerCollision(gameObject.layer, aimMask, true);
+        if(MoveInput == Vector2.zero)
+        {
+            rb.linearVelocity = transform.forward * dashvelocity;
+        }
+        else
+        {
+            rb.linearVelocity = MoveInput.normalized * dashvelocity;
+        }
+        StartCoroutine(fovchanger(120f));
+        yield return new WaitForSeconds(dashtime);
+        Physics.IgnoreLayerCollision(gameObject.layer, aimMask, false);
+        rb.useGravity = true;
+        StartCoroutine(fovchanger(80f));
+        yield return new WaitForSeconds(dashcooldown);
+        isdashing = false;
+    }
     public void OnAim(InputAction.CallbackContext context)
     {
         if (context.performed || knockedback)
@@ -125,6 +159,7 @@ public class playermanager : MonoBehaviour
             //StartCoroutine(fovchanger(80f));
         }
     }
+    
     IEnumerator fovchanger(float targetlens)
     {
         while(cinecamera.Lens.FieldOfView != targetlens)
@@ -134,6 +169,7 @@ public class playermanager : MonoBehaviour
         }
         fovroutine = null;
     }
+    
     public void OnRailgun(InputAction.CallbackContext context)
     {
         //float initialvelocity = speed;
@@ -176,7 +212,7 @@ public class playermanager : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f, aimMask))
         {
             targetpoint = hit.point;
-            Debug.Log(hit.collider.name);
+            //Debug.Log(hit.collider.name);
         }
         else
         {
@@ -315,16 +351,17 @@ public class playermanager : MonoBehaviour
     public bool knockedback;
     public IEnumerator knockback(float knockbacktime, float knockbackforce,Vector3 pointofcontact)
     {
+        if (isdashing) yield break;
         //float initailspeed = speed;
         knockedback = true;
         Vector3 dir = transform.position - pointofcontact;
         dir.y = 0;
         rb.AddForce(dir.normalized * knockbackforce, ForceMode.Impulse);
         anim.SetBool("knockback",true);
-        Debug.Log(rb.linearVelocity);
-        Debug.DrawLine(transform.position, pointofcontact, Color.darkCyan, 2f);
-        Debug.Log("the direction"+ dir);
-        Debug.Log("the distance between "+Vector3.Magnitude(transform.position - pointofcontact));
+        //Debug.Log(rb.linearVelocity);
+        //Debug.DrawLine(transform.position, pointofcontact, Color.darkCyan, 2f);
+        //Debug.Log("the direction"+ dir);
+        //Debug.Log("the distance between "+Vector3.Magnitude(transform.position - pointofcontact));
         yield return new WaitForSeconds(knockbacktime);
         anim.SetBool("knockback",false);
         knockedback = false;

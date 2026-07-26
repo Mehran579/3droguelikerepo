@@ -6,6 +6,7 @@ public class healthmanager : MonoBehaviour
     public Transform damagespawn;
     public GameObject damageprefab;
     public float health;
+    bool dead;
     void Start()
     {
         
@@ -14,15 +15,20 @@ public class healthmanager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(health <= 0)
+        if(health <= 0 && !dead)
         {
-            Destroy(gameObject);
+            dead = true;
+            if (!gameObject.CompareTag("Player"))
+            {
+                GetComponent<enemy_manager>().disablecollider();
+                GetComponent<Animator>().SetTrigger("die"+Random.Range(0,4));
+            }
         }
     }
     public void takedamage(float damageamount)
     {
         health -= damageamount;
-        Debug.Log("damage taken"+ health);
+        //Debug.Log("damage taken"+ health);
         if (!gameObject.CompareTag("Player"))
         {
             GameObject text = Instantiate(damageprefab, damagespawn.position + (Random.insideUnitSphere*0.2f), Quaternion.LookRotation(-GameObject.FindWithTag("Player").transform.position + transform.position));
@@ -37,5 +43,9 @@ public class healthmanager : MonoBehaviour
             }
             Destroy(text,1f);
         }
+    }
+    public void death()
+    {
+        Destroy(gameObject);
     }
 }

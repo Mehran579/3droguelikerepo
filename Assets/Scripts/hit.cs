@@ -20,7 +20,7 @@ public class hit : MonoBehaviour
     {
         if (collision.transform.root.CompareTag("Player"))
         {
-            Debug.Log(collision.transform.root);
+            //Debug.Log(collision.transform.root);
             collision.transform.root.GetComponent<healthmanager>().takedamage(damageamount);
             collision.transform.root.GetComponent<playermanager>().StartCoroutine(collision.transform.root.GetComponent<playermanager>().knockback(knockbacktime,knockbackforce,collision.ClosestPoint(transform.position)));
         }
