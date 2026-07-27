@@ -96,41 +96,57 @@ public class playermanager : MonoBehaviour
         }
     }
     public bool isdashing;
+    public bool candash;
     public float _Dashtime;
     public float _dashvelocity;
     public float _dashcooldown;
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (context.performed && !isdashing)
+        if (context.performed && !isdashing && candash)
         {
             StartCoroutine(DashRoutine(_Dashtime, _dashvelocity, _dashcooldown));
         }
     }
     IEnumerator DashRoutine(float dashtime,float dashvelocity, float dashcooldown)
     {
+        candash = false;
         isdashing = true;
+        //cinecamera.Lens.FieldOfView = 120f;
+        if (MoveInput.y > 0 || MoveInput == Vector2.zero)
+            anim.SetTrigger("df");
+        else if (MoveInput.y < 0)
+            anim.SetTrigger("db");
+        else if (MoveInput.x > 0)
+            anim.SetTrigger("dr");
+        else
+            anim.SetTrigger("dl");
         yield return new WaitForSeconds(0.024f);
         rb.useGravity = false;
-        Physics.IgnoreLayerCollision(gameObject.layer, aimMask, true);
-        if(MoveInput == Vector2.zero)
+        Physics.IgnoreLayerCollision(gameObject.layer , 6, true);
+        Vector3 dashdirection;
+        if (MoveInput == Vector2.zero)
         {
-            rb.linearVelocity = transform.forward * dashvelocity;
+            dashdirection = transform.forward;
         }
         else
         {
-            rb.linearVelocity = MoveInput.normalized * dashvelocity;
+            dashdirection = (transform.right * MoveInput.x + transform.forward * MoveInput.y).normalized;
         }
-        StartCoroutine(fovchanger(120f));
+        rb.linearVelocity = new Vector3(dashdirection.x * dashvelocity, rb.linearVelocity.y, dashdirection.z * dashvelocity);
+        StartCoroutine(fovchanger(120f,30f));
         yield return new WaitForSeconds(dashtime);
-        Physics.IgnoreLayerCollision(gameObject.layer, aimMask, false);
+        Physics.IgnoreLayerCollision(7 , 6, false);
         rb.useGravity = true;
-        StartCoroutine(fovchanger(80f));
-        yield return new WaitForSeconds(dashcooldown);
         isdashing = false;
+        //cinecamera.Lens.FieldOfView = 80f;
+        StartCoroutine(fovchanger(80f,30f));
+        yield return new WaitForSeconds(dashcooldown);
+        candash = true;
     }
     public void OnAim(InputAction.CallbackContext context)
     {
-        if (context.performed || knockedback)
+        if (knockedback) return;
+        if (context.performed)
         {
             if (!firepressed)
             {
@@ -141,7 +157,7 @@ public class playermanager : MonoBehaviour
             {
                 StopCoroutine(fovroutine);
             }
-            fovroutine = StartCoroutine(fovchanger(40f));
+            fovroutine = StartCoroutine(fovchanger(40f,40f));
         }
         if(context.canceled)
         {
@@ -150,7 +166,7 @@ public class playermanager : MonoBehaviour
             {
                 StopCoroutine(fovroutine);
             }
-            fovroutine = StartCoroutine(fovchanger(80f));
+            fovroutine = StartCoroutine(fovchanger(80f,40f));
 
             if (!holdingrailgun)
             {
@@ -160,13 +176,14 @@ public class playermanager : MonoBehaviour
         }
     }
     
-    IEnumerator fovchanger(float targetlens)
+    IEnumerator fovchanger(float targetlens,float changetime)
     {
-        while(cinecamera.Lens.FieldOfView != targetlens)
+        while(Mathf.Abs(cinecamera.Lens.FieldOfView - targetlens) > 0.01f)
         {
-            cinecamera.Lens.FieldOfView = Mathf.Lerp(cinecamera.Lens.FieldOfView, targetlens, 40f * Time.deltaTime);
+            cinecamera.Lens.FieldOfView = Mathf.Lerp(cinecamera.Lens.FieldOfView, targetlens, changetime * Time.deltaTime);
             yield return null;
         }
+        cinecamera.Lens.FieldOfView = targetlens;
         fovroutine = null;
     }
     
@@ -239,7 +256,7 @@ public class playermanager : MonoBehaviour
     }
     void Update()
     {
-        if (knockedback) return;
+        if (knockedback || isdashing) return;
         if (Mouse.current.scroll.ReadValue()!= Vector2.zero)
         {
             if (weapon1.activeInHierarchy)
@@ -296,7 +313,7 @@ public class playermanager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (knockedback) return;
+        if (knockedback || isdashing) return;
         Vector3 camf = Camera.main.transform.forward;
         camf.y = 0;
         camf.Normalize();
