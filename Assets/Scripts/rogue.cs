@@ -21,6 +21,14 @@ public class rogue : MonoBehaviour
 
     void Update()
     {
+        if(GetComponent<healthmanager>().health <= 0)
+        {
+            foreach (Renderer r in rends)
+            {
+                r.enabled = true;
+            }
+            return;
+        }
         float dist = Vector3.Distance(transform.position, player.position);
         if (dist < visible_Distance && !ishidden) 
         {

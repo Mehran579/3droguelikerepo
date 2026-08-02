@@ -642,6 +642,7 @@ MonoBehaviour:
   myfollowpoint: {fileID: 0}
   speed: 1
   attack_distance: 1.5
+  impactparticle: {fileID: 6533142167724159174, guid: b499273f255b30141a18574443c4bc9c, type: 3}
 --- !u!4 &2105632209118012673 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 13007df5cffdbc94ebbea955c6758111, type: 3}

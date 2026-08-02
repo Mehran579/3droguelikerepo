@@ -849,7 +849,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::healthmanager
   damagespawn: {fileID: 1422549368999232708}
   damageprefab: {fileID: 6183539637084484095, guid: bce0a5b96a90e134c9d4b13054af5e73, type: 3}
-  health: 20
+  health: 5
 --- !u!54 &1747999278522612699
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -894,6 +894,7 @@ MonoBehaviour:
   myfollowpoint: {fileID: 0}
   speed: 3
   attack_distance: 2.5
+  impactparticle: {fileID: 6533142167724159174, guid: b499273f255b30141a18574443c4bc9c, type: 3}
 --- !u!114 &1186550015575276869
 MonoBehaviour:
   m_ObjectHideFlags: 0

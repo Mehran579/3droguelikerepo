@@ -667,6 +667,7 @@ MonoBehaviour:
   myfollowpoint: {fileID: 0}
   speed: 1
   attack_distance: 1.5
+  impactparticle: {fileID: 6533142167724159174, guid: b499273f255b30141a18574443c4bc9c, type: 3}
 --- !u!54 &1295213238086235095
 Rigidbody:
   m_ObjectHideFlags: 0

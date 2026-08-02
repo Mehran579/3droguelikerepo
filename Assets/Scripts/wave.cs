@@ -22,7 +22,7 @@ public class wave : MonoBehaviour
     }
     IEnumerator Wave1()
     {
-        for(int i = 0;  i < deceptive_delay_quartic(WaveNumber); i++)
+        for(int i = 0;  i < tinycubic(WaveNumber); i++)
         {
             Vector3 Spawnpos = new Vector3(Random.Range(-30, 30), 0, Random.Range(-30, 30));
             if(Vector3.Distance(Spawnpos, player.position)> 5)
@@ -37,7 +37,7 @@ public class wave : MonoBehaviour
     }
     IEnumerator Wave2() 
     {
-        for (int i = 0; i < deceptive_delay_quartic(WaveNumber); i++)
+        for (int i = 0; i < tinycubic(WaveNumber); i++)
         {
             Vector3 Spawnpos = new Vector3(Random.Range(-30, 30), 0, Random.Range(-30, 30));
             if(Vector3.Distance(Spawnpos, player.position)> 5)
@@ -52,7 +52,7 @@ public class wave : MonoBehaviour
     }
     IEnumerator wave3()
     {
-        for (int i = 0; i < deceptive_delay_quartic(WaveNumber); i++)
+        for (int i = 0; i < tinycubic(WaveNumber); i++)
         {
             Vector3 Spawnpos = new Vector3(Random.Range(-50, 50), 0, Random.Range(-50, 50));
             if (Vector3.Distance(Spawnpos, player.position) > 5)
@@ -67,7 +67,7 @@ public class wave : MonoBehaviour
     }
     IEnumerator THEWAVE()
     {
-        for(int i = 0;i < deceptive_delay_quartic(WaveNumber);i++)
+        for(int i = 0;i < tinycubic(WaveNumber);i++)
         {
             Vector3 spawnpos = new Vector3(Random.Range(-75, 75), 0, Random.Range(-75, 75));
             if (Vector3.Distance(spawnpos, player.position) > 5)
@@ -78,17 +78,17 @@ public class wave : MonoBehaviour
                 //_enemyhit.damageamount += softhorizon(WaveNumber) / 2;
                 enemy.GetComponentInChildren<hit>().damageamount += softhorizon(WaveNumber) / 2;
                 enemy.GetComponent<healthmanager>().health += centimeterruler(WaveNumber);
-                yield return new WaitForSeconds(1/WaveNumber);
+                yield return new WaitForSeconds(Random.Range(0.3f,1.5f));
             }
         }
             yield return new WaitForSeconds(75f);
         WaveNumber += 1;
         StartCoroutine(THEWAVE());
     }
-    float deceptive_delay_quartic(float wavenumber)
+    float tinycubic(float wavenumber)
     {
         Debug.Log("current wave no is "+ WaveNumber + " and no of enemies to spawn is " + (((wavenumber - 4) * wavenumber + 5) * wavenumber + 1));
-        return ((wavenumber - 4) * wavenumber + 5) * wavenumber + 1;
+        return ((0.002f * wavenumber + 0.05f) * wavenumber + 1f) * wavenumber + 1f;
     }
     float centimeterruler(float wavenumber)
     {

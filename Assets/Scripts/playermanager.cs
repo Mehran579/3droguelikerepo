@@ -36,6 +36,7 @@ public class playermanager : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         weapon1.SetActive(true);
         weapon2.SetActive(false);
+        //riflemuzzle.gameObject.SetActive(false);
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -100,6 +101,7 @@ public class playermanager : MonoBehaviour
     public float _Dashtime;
     public float _dashvelocity;
     public float _dashcooldown;
+    public float _dashzoomout;
     public void OnDash(InputAction.CallbackContext context)
     {
         if (context.performed && !isdashing && candash)
@@ -111,6 +113,8 @@ public class playermanager : MonoBehaviour
     {
         candash = false;
         isdashing = true;
+        Vector3 lockedf = transform.forward;
+        Vector3 lockedr = transform.right;
         //cinecamera.Lens.FieldOfView = 120f;
         if (MoveInput.y > 0 || MoveInput == Vector2.zero)
             anim.SetTrigger("df");
@@ -126,20 +130,21 @@ public class playermanager : MonoBehaviour
         Vector3 dashdirection;
         if (MoveInput == Vector2.zero)
         {
-            dashdirection = transform.forward;
+            dashdirection = lockedf;
         }
         else
         {
-            dashdirection = (transform.right * MoveInput.x + transform.forward * MoveInput.y).normalized;
+            dashdirection = (lockedr * MoveInput.x + lockedf * MoveInput.y).normalized;
         }
         rb.linearVelocity = new Vector3(dashdirection.x * dashvelocity, rb.linearVelocity.y, dashdirection.z * dashvelocity);
-        StartCoroutine(fovchanger(120f,30f));
+        StartCoroutine(fovchanger(_dashzoomout,30f));
+        StartCoroutine(GetComponent<dashtrailplayer>().dashtrail());
         yield return new WaitForSeconds(dashtime);
         Physics.IgnoreLayerCollision(7 , 6, false);
         rb.useGravity = true;
         isdashing = false;
         //cinecamera.Lens.FieldOfView = 80f;
-        StartCoroutine(fovchanger(80f,30f));
+        StartCoroutine(fovchanger(80f, 30f));
         yield return new WaitForSeconds(dashcooldown);
         candash = true;
     }
@@ -178,7 +183,7 @@ public class playermanager : MonoBehaviour
     
     IEnumerator fovchanger(float targetlens,float changetime)
     {
-        while(Mathf.Abs(cinecamera.Lens.FieldOfView - targetlens) > 0.01f)
+        while(Mathf.Abs(cinecamera.Lens.FieldOfView - targetlens) > 0.1f)
         {
             cinecamera.Lens.FieldOfView = Mathf.Lerp(cinecamera.Lens.FieldOfView, targetlens, changetime * Time.deltaTime);
             yield return null;
@@ -235,14 +240,14 @@ public class playermanager : MonoBehaviour
         {
             targetpoint = ray.GetPoint(1000);
         }
+
+
         //real bullet
-
-
         Vector3 realbulletorigin = ray.origin + ray.direction * 0.5f;
         Quaternion aimrotation = Quaternion.FromToRotation(Vector3.up, ray.direction);
         GameObject realBullet = Instantiate(railgunbullet, realbulletorigin, Quaternion.identity * Quaternion.Euler(90f,0,0));
         realBullet.transform.right = -ray.direction;
-        Debug.DrawLine(shootpoint.position, targetpoint, Color.blue, 5f);
+        Debug.DrawLine(realbulletorigin, targetpoint, Color.blue, 5f);
         realBullet.GetComponent<Rigidbody>().linearVelocity = ray.direction * 500;
         realBullet.GetComponent<railgunbulletbehaviour>().getdir(ray.direction);
 
@@ -253,10 +258,22 @@ public class playermanager : MonoBehaviour
         Debug.DrawLine(shootpoint.position, targetpoint, Color.red, 5f);
         //player knockback;
         rb.AddForce(-transform.forward * 30, ForceMode.Impulse);
+        //Destroy(bullet, 0.5f);
+        //Destroy(realBullet,0.5f);
     }
     void Update()
     {
-        if (knockedback || isdashing) return;
+        if (knockedback || isdashing) 
+        {
+            riflemuzzle.Stop();
+            //riflemuzzle.gameObject.SetActive(false);
+            return;
+        }
+        if(!anim.GetCurrentAnimatorStateInfo(0).IsName("Ranged_2H_Shooting"))
+        {
+            //riflemuzzle.gameObject.SetActive(false);
+            riflemuzzle.Stop();
+        }
         if (Mouse.current.scroll.ReadValue()!= Vector2.zero)
         {
             if (weapon1.activeInHierarchy)
@@ -284,9 +301,18 @@ public class playermanager : MonoBehaviour
         shootrifle();
         anim.SetBool("shooting", true);
     }
+    public ParticleSystem riflemuzzle;
     public void shootrifle()
     {
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("Idle_B")) return;
+        if (!riflemuzzle.isPlaying)
+        {
+            riflemuzzle.Play();
+        }
+        //if (!riflemuzzle.gameObject.activeSelf)
+        //{
+        //    riflemuzzle.gameObject.SetActive(true);
+        //}
         GameObject bulletskin = Instantiate(riflebulletskin, shootpoint.position, shootpoint.rotation);
         Vector3 targetpoint;
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
@@ -308,6 +334,8 @@ public class playermanager : MonoBehaviour
         Debug.DrawLine(shootpoint.position, targetpoint, Color.red, 10f);
         bulletskin.transform.right = -(targetpoint - shootpoint.position).normalized;
         bulletskin.GetComponent<Rigidbody>().linearVelocity = (targetpoint - shootpoint.position).normalized * 300;
+        Destroy(bulletskin, 0.25f);
+        Destroy(realbullet, 0.25f);
         //player knockback;
         rb.AddForce(-transform.forward * 10, ForceMode.Impulse);
     }

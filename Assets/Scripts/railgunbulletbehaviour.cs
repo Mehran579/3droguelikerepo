@@ -8,7 +8,7 @@ public class railgunbulletbehaviour : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        Debug.Log("hehe");
+        //Debug.Log("hehe");
     }
 
     public void getdir(Vector3 direction)
@@ -20,5 +20,13 @@ public class railgunbulletbehaviour : MonoBehaviour
     void FixedUpdate()
     {
         rb.linearVelocity = dir * 500f;
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.transform.root.gameObject.layer == 6)
+        {
+            collision.transform.root.gameObject.GetComponent<Rigidbody>().AddExplosionForce(13, collision.contacts[0].point, 10, 4, ForceMode.Impulse);
+        }
+        Physics.IgnoreCollision(GetComponent<Collider>(), collision.collider);
     }
 }

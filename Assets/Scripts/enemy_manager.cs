@@ -54,16 +54,24 @@ public class enemy_manager : MonoBehaviour
     {
         weapon.enabled = false;
     }
+    public GameObject impactparticle;
     public void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("bullet"))
         {
+            Instantiate(impactparticle, other.GetContact(0).point, Quaternion.LookRotation(player.transform.position - transform.position));
             GetComponent<healthmanager>().takedamage(1);
         }
         else if (other.gameObject.CompareTag("railgunbullet"))
         {
             GetComponent<healthmanager>().takedamage(100);
+            Debug.Log("duh am a trigger");
         }
     }
-
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("railgunbullet"))
+        {
+        }
+    }
 }
