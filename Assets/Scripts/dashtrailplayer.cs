@@ -20,8 +20,11 @@ public class dashtrailplayer : MonoBehaviour
     public float meshdestroydelay;
     public Material mat;
     SkinnedMeshRenderer[] skinnedMeshRenderers;
-    public IEnumerator dashtrail()
+    public IEnumerator dashtrail(float activetimegiven,float refreshrategiven,Material matgiven)
     {
+        activetime = activetimegiven;
+        meshrefreshrate = refreshrategiven;
+        mat = matgiven;
         if (istrailactive) yield break;
         istrailactive = true;
         float tospawntime = activetime;
@@ -58,8 +61,8 @@ public class dashtrailplayer : MonoBehaviour
             valuetofade -= rate;
             mat.SetFloat(shadervarref, valuetofade); 
             yield return new WaitForSeconds(refreshrate);
-            Debug.Log('c');
-            Debug.Log(valuetofade);
+            //Debug.Log('c');
+            //Debug.Log(valuetofade);
         }
     }
 }

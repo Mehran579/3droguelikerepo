@@ -63,25 +63,57 @@ public class playermanager : MonoBehaviour
         if (knockedback) return;
         if (context.performed)
         {
-            //Debug.Log($"Jump pressed. coyotetimer: {coyotetimer}");
-            inputtimer = inputtime;
-            if (coyotetimer > 0)
+            if (!canjump) return;
+            if (isjumping && !isdiving && !isdashing)
             {
-                dojump();
+                isdiving = true;
+                StartCoroutine(desolatedive());
             }
-            //playerrb.AddForce(Vector2.up * jump, ForceMode2D.Impulse);
+            else
+            {
+                inputtimer = inputtime;
+                if (coyotetimer > 0)
+                {
+                    dojump();
+                }
+            }
 
         }
         else if (context.canceled)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f,rb.linearVelocity.z);
-            //playerrb.AddForce(Vector2.up * jump * 0.5f, ForceMode2D.Impulse);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f, rb.linearVelocity.z);
             coyotetimer = 0;
         }
     }
+    public Material dashmat;
+    public Material divemat;
+    public bool canjump = true;
+    public bool isdiving;
+    public bool candiveattack;
+    IEnumerator desolatedive()
+    {
+        candash = false;
+        canjump = false;
+        rb.useGravity = false;
+        rb.linearVelocity = Vector3.zero;
+        anim.SetTrigger("dive");
+        yield return new WaitForSeconds(0.3f);
+        StartCoroutine(GetComponent<dashtrailplayer>().dashtrail(0.1f, 0.01f, divemat));
+        rb.linearVelocity = new Vector3(0, -100, 0);
+        rb.useGravity = true;
+        candiveattack = true;
+        //isdiving = false;
+        yield return new WaitForSeconds(0.5f);
+        canjump = true;
+    }
+    public void enddive()
+    {
+        candash = true;
+        isdiving = false;
+    }
     public void OnRifleAttack(InputAction.CallbackContext context)
     {
-        if (!weapon1.activeSelf || knockedback) return;
+        if (!weapon1.activeSelf || knockedback || isdiving) return;
         if (context.performed)
         {
             firepressed = true;
@@ -89,7 +121,8 @@ public class playermanager : MonoBehaviour
             //anim.SetTrigger("attacking");   
 
             //StartCoroutine(attackcooldown());
-        }else if (context.canceled)
+        }
+        else if (context.canceled)
         {
             anim.SetBool("shooting", false);
             anim.SetBool("aiming", false);
@@ -109,7 +142,7 @@ public class playermanager : MonoBehaviour
             StartCoroutine(DashRoutine(_Dashtime, _dashvelocity, _dashcooldown));
         }
     }
-    IEnumerator DashRoutine(float dashtime,float dashvelocity, float dashcooldown)
+    IEnumerator DashRoutine(float dashtime, float dashvelocity, float dashcooldown)
     {
         candash = false;
         isdashing = true;
@@ -126,7 +159,7 @@ public class playermanager : MonoBehaviour
             anim.SetTrigger("dl");
         yield return new WaitForSeconds(0.024f);
         rb.useGravity = false;
-        Physics.IgnoreLayerCollision(gameObject.layer , 6, true);
+        Physics.IgnoreLayerCollision(gameObject.layer, 6, true);
         Vector3 dashdirection;
         if (MoveInput == Vector2.zero)
         {
@@ -137,10 +170,10 @@ public class playermanager : MonoBehaviour
             dashdirection = (lockedr * MoveInput.x + lockedf * MoveInput.y).normalized;
         }
         rb.linearVelocity = new Vector3(dashdirection.x * dashvelocity, rb.linearVelocity.y, dashdirection.z * dashvelocity);
-        StartCoroutine(fovchanger(_dashzoomout,30f));
-        StartCoroutine(GetComponent<dashtrailplayer>().dashtrail());
+        StartCoroutine(fovchanger(_dashzoomout, 30f));
+        StartCoroutine(GetComponent<dashtrailplayer>().dashtrail(0.27f, 0.02f, dashmat));
         yield return new WaitForSeconds(dashtime);
-        Physics.IgnoreLayerCollision(7 , 6, false);
+        Physics.IgnoreLayerCollision(7, 6, false);
         rb.useGravity = true;
         isdashing = false;
         //cinecamera.Lens.FieldOfView = 80f;
@@ -148,30 +181,43 @@ public class playermanager : MonoBehaviour
         yield return new WaitForSeconds(dashcooldown);
         candash = true;
     }
+    public CinemachineInputAxisController inputAxisController;
+    public float[] savedGains;
+    public float aim_sensi_multiplier;
     public void OnAim(InputAction.CallbackContext context)
     {
         if (knockedback) return;
+        var controllers = inputAxisController.Controllers;
         if (context.performed)
         {
+            savedGains = new float[controllers.Count];
+            for (int i = 0; i < controllers.Count; i++)
+            {
+                savedGains[i] = controllers[i].Input.Gain;
+                if (controllers[i].Name == "Look Orbit X" || controllers[i].Name == "Look Orbit Y")
+                    controllers[i].Input.Gain *= aim_sensi_multiplier;
+            }
             if (!firepressed)
             {
                 anim.SetBool("aiming", true);
             }
             //cinecamera.Lens.FieldOfView = 40f;
-            if(fovroutine != null)
+            if (fovroutine != null)
             {
                 StopCoroutine(fovroutine);
             }
-            fovroutine = StartCoroutine(fovchanger(40f,40f));
+            fovroutine = StartCoroutine(fovchanger(40f, 40f));
         }
-        if(context.canceled)
+        if (context.canceled)
         {
             //cinecamera.Lens.FieldOfView = 80f;
-            if(fovroutine != null)
+            for (int i = 0; i < controllers.Count; i++)
+                controllers[i].Input.Gain = savedGains[i];
+            if (fovroutine != null)
             {
                 StopCoroutine(fovroutine);
             }
-            fovroutine = StartCoroutine(fovchanger(80f,40f));
+            fovroutine = StartCoroutine(fovchanger(80f, 40f));
 
             if (!holdingrailgun)
             {
@@ -180,10 +226,10 @@ public class playermanager : MonoBehaviour
             //StartCoroutine(fovchanger(80f));
         }
     }
-    
-    IEnumerator fovchanger(float targetlens,float changetime)
+
+    IEnumerator fovchanger(float targetlens, float changetime)
     {
-        while(Mathf.Abs(cinecamera.Lens.FieldOfView - targetlens) > 0.1f)
+        while (Mathf.Abs(cinecamera.Lens.FieldOfView - targetlens) > 0.1f)
         {
             cinecamera.Lens.FieldOfView = Mathf.Lerp(cinecamera.Lens.FieldOfView, targetlens, changetime * Time.deltaTime);
             yield return null;
@@ -191,11 +237,11 @@ public class playermanager : MonoBehaviour
         cinecamera.Lens.FieldOfView = targetlens;
         fovroutine = null;
     }
-    
+
     public void OnRailgun(InputAction.CallbackContext context)
     {
         //float initialvelocity = speed;
-        if (!weapon2.activeSelf || knockedback) return;
+        if (!weapon2.activeSelf || knockedback || isdiving) return;
         if (context.started)
         {
             speed *= 0.5f;
@@ -245,7 +291,7 @@ public class playermanager : MonoBehaviour
         //real bullet
         Vector3 realbulletorigin = ray.origin + ray.direction * 0.5f;
         Quaternion aimrotation = Quaternion.FromToRotation(Vector3.up, ray.direction);
-        GameObject realBullet = Instantiate(railgunbullet, realbulletorigin, Quaternion.identity * Quaternion.Euler(90f,0,0));
+        GameObject realBullet = Instantiate(railgunbullet, realbulletorigin, Quaternion.identity * Quaternion.Euler(90f, 0, 0));
         realBullet.transform.right = -ray.direction;
         Debug.DrawLine(realbulletorigin, targetpoint, Color.blue, 5f);
         realBullet.GetComponent<Rigidbody>().linearVelocity = ray.direction * 500;
@@ -263,18 +309,26 @@ public class playermanager : MonoBehaviour
     }
     void Update()
     {
-        if (knockedback || isdashing) 
+        //if(anim.GetCurrentAnimatorStateInfo(0).IsName("desolate dive"))
+        //{
+        //    isdiving = true;
+        //}
+        //else
+        //{
+        //    isdiving = false;
+        //}
+        if (knockedback || isdashing)
         {
             riflemuzzle.Stop();
             //riflemuzzle.gameObject.SetActive(false);
             return;
         }
-        if(!anim.GetCurrentAnimatorStateInfo(0).IsName("Ranged_2H_Shooting"))
+        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Ranged_2H_Shooting"))
         {
             //riflemuzzle.gameObject.SetActive(false);
             riflemuzzle.Stop();
         }
-        if (Mouse.current.scroll.ReadValue()!= Vector2.zero)
+        if (Mouse.current.scroll.ReadValue() != Vector2.zero)
         {
             if (weapon1.activeInHierarchy)
             {
@@ -327,7 +381,7 @@ public class playermanager : MonoBehaviour
         }
         //realbullet
         Vector3 realBulletOrigin = ray.origin + ray.direction * 0.5f;
-        GameObject realbullet = Instantiate(riflebullet,realBulletOrigin,Quaternion.identity);
+        GameObject realbullet = Instantiate(riflebullet, realBulletOrigin, Quaternion.identity);
         realbullet.GetComponent<Rigidbody>().linearVelocity = (targetpoint - realBulletOrigin).normalized * 300f;
         Debug.DrawLine(realBulletOrigin, targetpoint, Color.pink, 5f);
         //visual bullet;
@@ -341,7 +395,7 @@ public class playermanager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (knockedback || isdashing) return;
+        if (knockedback || isdashing || isdiving) return;
         Vector3 camf = Camera.main.transform.forward;
         camf.y = 0;
         camf.Normalize();
@@ -358,6 +412,10 @@ public class playermanager : MonoBehaviour
             {
                 dojump();
             }
+            else if (rb.linearVelocity.y <= 0.01f)
+            {
+                isjumping = false;
+            }
         }
         else if (!isGrounded())
         {
@@ -365,11 +423,29 @@ public class playermanager : MonoBehaviour
         }
         inputtimer -= Time.deltaTime;
     }
+    public float diveradius;
+    public float diveforce;
+    public void DiveAttack()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, diveradius);
+
+        foreach (Collider hit in hits)
+        {
+            Rigidbody hitrb = hit.attachedRigidbody;
+            if (hitrb == null || hitrb == rb) continue;
+            //Debug.Log(hit);
+            //Debug.Log($"Hit: {hit.name}");
+            //Debug.Log($"Attached RB: {hit.attachedRigidbody}");
+            hitrb.AddExplosionForce(diveforce, transform.position, diveradius, 3f, ForceMode.Impulse);
+        }
+    }
+    public bool isjumping;
     public void dojump()
     {
         coyotetimer = 0;
         inputtimer = 0;
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, jump, rb.linearVelocity.z);
+        isjumping = true;
     }
     public float coyotetime;
     float coyotetimer;
@@ -391,26 +467,41 @@ public class playermanager : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position - transform.up * castdistance, raycastradius);
+
+        Gizmos.color = Color.violet;
+        Gizmos.DrawWireSphere(transform.position, diveradius);
     }
     public bool knockedback;
-    public IEnumerator knockback(float knockbacktime, float knockbackforce,Vector3 pointofcontact)
+    public IEnumerator knockback(float knockbacktime, float knockbackforce, Vector3 pointofcontact)
     {
-        if (isdashing) yield break;
+        if (isdashing || isdiving) yield break;
         //float initailspeed = speed;
         knockedback = true;
         Vector3 dir = transform.position - pointofcontact;
         dir.y = 0;
         rb.AddForce(dir.normalized * knockbackforce, ForceMode.Impulse);
-        anim.SetBool("knockback",true);
+        anim.SetBool("knockback", true);
         //Debug.Log(rb.linearVelocity);
         //Debug.DrawLine(transform.position, pointofcontact, Color.darkCyan, 2f);
         //Debug.Log("the direction"+ dir);
         //Debug.Log("the distance between "+Vector3.Magnitude(transform.position - pointofcontact));
         yield return new WaitForSeconds(knockbacktime);
-        anim.SetBool("knockback",false);
+        anim.SetBool("knockback", false);
         knockedback = false;
         //speed = initailspeed;
     }
-
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("ground"))
+        {
+            if (candiveattack)
+            {
+                isdiving = false;
+                candiveattack = false;
+                DiveAttack();
+            }
+        }
+    }
 }

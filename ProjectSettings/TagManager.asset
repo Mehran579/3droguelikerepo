@@ -6,6 +6,8 @@ TagManager:
   tags:
   - bullet
   - railgunbullet
+  - FxTemporaire
+  - ground
   layers:
   - Default
   - TransparentFX
