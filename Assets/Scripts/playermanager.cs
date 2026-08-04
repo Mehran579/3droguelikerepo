@@ -239,13 +239,15 @@ public class playermanager : MonoBehaviour
         cinecamera.Lens.FieldOfView = targetlens;
         fovroutine = null;
     }
-
+    Coroutine chargeVfxRoutine;
     public void OnRailgun(InputAction.CallbackContext context)
     {
         //float initialvelocity = speed;
         if (!weapon2.activeSelf || knockedback || isdiving) return;
         if (context.started)
         {
+            railgunchargevfxobj.gameObject.SetActive(true);
+            chargeVfxRoutine = StartCoroutine(railgunchargevfx());
             speed *= 0.5f;
             holdingrailgun = true;
             anim.SetBool("aiming", true);
@@ -254,6 +256,8 @@ public class playermanager : MonoBehaviour
         }
         if (context.canceled)
         {
+            StopCoroutine(chargeVfxRoutine);
+            railgunchargevfxobj.gameObject.SetActive(false);
             speed *= 2;
             holdingrailgun = false;
             anim.SetBool("aiming", false);
@@ -265,10 +269,28 @@ public class playermanager : MonoBehaviour
         }
     }
     public float railguncooldown;
+    public Transform railgunchargevfxobj;
+    IEnumerator railgunchargevfx()
+    {
+        float elapsed = 0;
+        float timebuff = 0.2f;
+        while (elapsed < railguncooldown + timebuff)
+        {
+            elapsed += Time.deltaTime;
+            railgunchargevfxobj.localScale = new Vector3(Mathf.Lerp(0,0.22f, elapsed/railguncooldown + timebuff), railgunchargevfxobj.localScale.y, railgunchargevfxobj.localScale.z);
+            yield return null;
+        }
+        if (holdingrailgun)
+        {
+            chargeVfxRoutine = StartCoroutine(railgunchargevfx());
+        }
+    }
     IEnumerator chargingrail()
     {
         while (holdingrailgun)
         {
+            //railgunchargevfxobj.gameObject.SetActive(true);
+            //StartCoroutine(railgunchargevfx());
             yield return new WaitForSeconds(railguncooldown);
             if (!holdingrailgun) yield break;
             anim.SetTrigger("attacking");
@@ -276,6 +298,8 @@ public class playermanager : MonoBehaviour
     }
     public void shootrailgun()
     {
+        //StopCoroutine(railgunchargevfx());
+        //railgunchargevfxobj.gameObject.SetActive(false);
         GameObject bullet = Instantiate(railgunbulletskin, shootpoint.position, shootpoint.rotation);
         Vector3 targetpoint;
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
@@ -296,18 +320,20 @@ public class playermanager : MonoBehaviour
         GameObject realBullet = Instantiate(railgunbullet, realbulletorigin, Quaternion.identity * Quaternion.Euler(90f, 0, 0));
         realBullet.transform.right = -ray.direction;
         Debug.DrawLine(realbulletorigin, targetpoint, Color.blue, 5f);
-        realBullet.GetComponent<Rigidbody>().linearVelocity = ray.direction * 500;
+        realBullet.GetComponent<Rigidbody>().linearVelocity = ray.direction * 250;
         realBullet.GetComponent<railgunbulletbehaviour>().getdir(ray.direction);
 
 
         //visual bulllet
         bullet.transform.right = -(targetpoint - shootpoint.position).normalized;
-        bullet.GetComponent<Rigidbody>().linearVelocity = (targetpoint - shootpoint.position).normalized * 500;
+        bullet.GetComponent<Rigidbody>().linearVelocity = (targetpoint - shootpoint.position).normalized * 250;
         Debug.DrawLine(shootpoint.position, targetpoint, Color.red, 5f);
         //player knockback;
         rb.AddForce(-transform.forward * 30, ForceMode.Impulse);
-        //Destroy(bullet, 0.5f);
-        //Destroy(realBullet,0.5f);
+        //Destroy(bulletskin, 0.25f);
+        //Destroy(realbullet, 0.25f);
+        Destroy(bullet, 0.5f);
+        Destroy(realBullet, 0.5f);
     }
     void Update()
     {
@@ -497,7 +523,10 @@ public class playermanager : MonoBehaviour
         Vector3 dir = transform.position - pointofcontact;
         dir.y = 0;
         rb.AddForce(dir.normalized * knockbackforce, ForceMode.Impulse);
-        anim.SetBool("knockback", true);
+        if (!holdingrailgun)
+        {
+            anim.SetBool("knockback", true);
+        }
         //Debug.Log(rb.linearVelocity);
         //Debug.DrawLine(transform.position, pointofcontact, Color.darkCyan, 2f);
         //Debug.Log("the direction"+ dir);
