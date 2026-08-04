@@ -72,6 +72,6 @@ Material:
     - _alpha: 1
     - _fresnel_power: 1.25
     m_Colors:
-    - _Color: {r: 0.373693, g: 1.8781075, b: 3.965298, a: 1}
+    - _Color: {r: 3.965298, g: 0.373693, b: 3.635791, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

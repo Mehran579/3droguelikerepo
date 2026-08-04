@@ -100,10 +100,12 @@ public class playermanager : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         StartCoroutine(GetComponent<dashtrailplayer>().dashtrail(0.1f, 0.01f, divemat));
         rb.linearVelocity = new Vector3(0, -100, 0);
+        Physics.IgnoreLayerCollision(gameObject.layer, 6, true);
         rb.useGravity = true;
         candiveattack = true;
         //isdiving = false;
         yield return new WaitForSeconds(0.5f);
+        Physics.IgnoreLayerCollision(gameObject.layer, 6, true);
         canjump = true;
     }
     public void enddive()
@@ -425,6 +427,8 @@ public class playermanager : MonoBehaviour
     }
     public float diveradius;
     public float diveforce;
+    public GameObject Expo;
+    public GameObject expoimpact;
     public void DiveAttack()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, diveradius);
@@ -437,7 +441,18 @@ public class playermanager : MonoBehaviour
             //Debug.Log($"Hit: {hit.name}");
             //Debug.Log($"Attached RB: {hit.attachedRigidbody}");
             hitrb.AddExplosionForce(diveforce, transform.position, diveradius, 3f, ForceMode.Impulse);
+            if(hit.GetComponent<healthmanager>() != null)
+                hit.GetComponent<healthmanager>().takedamage(0.5f);
         }
+        Expo.SetActive(true);
+        expoimpact.transform.position = transform.position + new Vector3(0, 0.1f, 0);
+        expoimpact.SetActive(true);
+        Invoke(nameof(disablexpo), 1f);
+    }
+    void disablexpo()
+    {
+        Expo.SetActive(false);
+        expoimpact.SetActive(false);
     }
     public bool isjumping;
     public void dojump()
@@ -492,6 +507,8 @@ public class playermanager : MonoBehaviour
         knockedback = false;
         //speed = initailspeed;
     }
+    public float expo_hit_stop;
+    public float expo_cam_shake;
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("ground"))
@@ -500,8 +517,21 @@ public class playermanager : MonoBehaviour
             {
                 isdiving = false;
                 candiveattack = false;
+                StartCoroutine(hitstop(0, expo_hit_stop));
                 DiveAttack();
+                GetComponent<CinemachineImpulseSource>().GenerateImpulse(expo_cam_shake);
             }
         }
+    }
+    public IEnumerator hitstop(float multiplier, float duration)
+    {
+        //Debug.Log("called");
+        float originalTimeScale = Time.timeScale;
+        float orgiginalfixedDeltaTime = Time.fixedDeltaTime;
+        Time.timeScale *= multiplier;
+        Time.fixedDeltaTime *= multiplier;
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = originalTimeScale;
+        Time.fixedDeltaTime = orgiginalfixedDeltaTime;
     }
 }
