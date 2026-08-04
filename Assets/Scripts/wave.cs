@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class wave : MonoBehaviour
@@ -7,6 +8,7 @@ public class wave : MonoBehaviour
     public GameObject[] enemies;
     float WaveInterval;
     public Transform player;
+    public TMP_Text currentwaveshow;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -19,6 +21,7 @@ public class wave : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        currentwaveshow.text = "Current Wave : "+ WaveNumber;
     }
     IEnumerator Wave1()
     {
@@ -87,7 +90,7 @@ public class wave : MonoBehaviour
     }
     float tinycubic(float wavenumber)
     {
-        Debug.Log("current wave no is "+ WaveNumber + " and no of enemies to spawn is " + (((wavenumber - 4) * wavenumber + 5) * wavenumber + 1));
+        //Debug.Log("current wave no is "+ WaveNumber + " and no of enemies to spawn is " + (((wavenumber - 4) * wavenumber + 5) * wavenumber + 1));
         return ((0.002f * wavenumber + 0.05f) * wavenumber + 1f) * wavenumber + 1f;
     }
     float centimeterruler(float wavenumber)

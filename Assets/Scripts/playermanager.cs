@@ -98,7 +98,7 @@ public class playermanager : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         anim.SetTrigger("dive");
         yield return new WaitForSeconds(0.3f);
-        StartCoroutine(GetComponent<dashtrailplayer>().dashtrail(0.1f, 0.01f, divemat));
+        StartCoroutine(GetComponent<dashtrailplayer>().dashtrail(0.01f, 0.001f, divemat));
         rb.linearVelocity = new Vector3(0, -100, 0);
         Physics.IgnoreLayerCollision(gameObject.layer, 6, true);
         rb.useGravity = true;
@@ -268,22 +268,23 @@ public class playermanager : MonoBehaviour
             }
         }
     }
+    public float railgun_cam_shake;
     public float railguncooldown;
     public Transform railgunchargevfxobj;
     IEnumerator railgunchargevfx()
     {
         float elapsed = 0;
-        float timebuff = 0.2f;
+        float timebuff = 0.167f;
         while (elapsed < railguncooldown + timebuff)
         {
             elapsed += Time.deltaTime;
             railgunchargevfxobj.localScale = new Vector3(Mathf.Lerp(0,0.22f, elapsed/railguncooldown + timebuff), railgunchargevfxobj.localScale.y, railgunchargevfxobj.localScale.z);
             yield return null;
         }
-        if (holdingrailgun)
-        {
-            chargeVfxRoutine = StartCoroutine(railgunchargevfx());
-        }
+        //if (holdingrailgun)
+        //{
+        //    chargeVfxRoutine = StartCoroutine(railgunchargevfx());
+        //}
     }
     IEnumerator chargingrail()
     {
@@ -298,6 +299,8 @@ public class playermanager : MonoBehaviour
     }
     public void shootrailgun()
     {
+        GetComponent<CinemachineImpulseSource>().GenerateImpulse(railgun_cam_shake);
+        chargeVfxRoutine = StartCoroutine(railgunchargevfx());
         //StopCoroutine(railgunchargevfx());
         //railgunchargevfxobj.gameObject.SetActive(false);
         GameObject bullet = Instantiate(railgunbulletskin, shootpoint.position, shootpoint.rotation);
@@ -329,7 +332,7 @@ public class playermanager : MonoBehaviour
         bullet.GetComponent<Rigidbody>().linearVelocity = (targetpoint - shootpoint.position).normalized * 250;
         Debug.DrawLine(shootpoint.position, targetpoint, Color.red, 5f);
         //player knockback;
-        rb.AddForce(-transform.forward * 30, ForceMode.Impulse);
+        rb.AddForce(-transform.forward * 100, ForceMode.Impulse);
         //Destroy(bulletskin, 0.25f);
         //Destroy(realbullet, 0.25f);
         Destroy(bullet, 0.5f);

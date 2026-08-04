@@ -1,5 +1,7 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class healthmanager : MonoBehaviour
 {
@@ -7,6 +9,8 @@ public class healthmanager : MonoBehaviour
     public GameObject damageprefab;
     public float health;
     bool dead;
+    public Slider player_health;
+    public TMP_Text player_health_text;
     void Start()
     {
         
@@ -22,6 +26,10 @@ public class healthmanager : MonoBehaviour
             {
                 GetComponent<enemy_manager>().disablecollider();
                 GetComponent<Animator>().SetTrigger("die"+Random.Range(0,4));
+            }
+            else
+            {
+                SceneManager.LoadScene(0);
             }
         }
     }
@@ -42,6 +50,11 @@ public class healthmanager : MonoBehaviour
                 text.GetComponent<TextMeshPro>().text = "0";
             }
             Destroy(text,1f);
+        }
+        else
+        {
+            player_health.value = health;
+            player_health_text.text = "Health : " + health.ToString();
         }
     }
     public void death()
