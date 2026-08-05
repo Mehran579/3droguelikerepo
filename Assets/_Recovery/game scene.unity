@@ -161,6 +161,7 @@ MonoBehaviour:
   speedx: {fileID: 1125426633}
   damagex: {fileID: 1261870106}
   healthx: {fileID: 683091260}
+  check: 0
 --- !u!4 &19115388
 Transform:
   m_ObjectHideFlags: 0
@@ -1180,7 +1181,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 330585545}
-  m_PlaneDistance: 0.5
+  m_PlaneDistance: 0.4
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1589,8 +1590,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0038153362, y: 0.18551596, z: 0.000720315, w: 0.9826336}
-  m_LocalPosition: {x: 0, y: 1.7114573, z: -4.030341}
+  m_LocalRotation: {x: -0.011132738, y: 0.18550545, z: 0.002101801, w: 0.982578}
+  m_LocalPosition: {x: 0, y: 1.6468488, z: -4.030341}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2483,7 +2484,7 @@ GameObject:
   - component: {fileID: 642946289}
   - component: {fileID: 642946290}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2624,7 +2625,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '  Health :'
+  m_text: '  Health : 00'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 062d41a612e14a04b8be75834bba091a, type: 2}
   m_sharedMaterial: {fileID: 2140474, guid: 062d41a612e14a04b8be75834bba091a, type: 2}
@@ -3670,7 +3671,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '  Speed :'
+  m_text: '  Speed : 00'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 062d41a612e14a04b8be75834bba091a, type: 2}
   m_sharedMaterial: {fileID: 2140474, guid: 062d41a612e14a04b8be75834bba091a, type: 2}
@@ -3921,7 +3922,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -710.75116, y: -483.71045}
+  m_AnchoredPosition: {x: -710.7512, y: -483.71045}
   m_SizeDelta: {x: -1755.4202, y: -1054.45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1165676485
@@ -4161,7 +4162,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '  Damage :'
+  m_text: '  Damage : 00'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 062d41a612e14a04b8be75834bba091a, type: 2}
   m_sharedMaterial: {fileID: 2140474, guid: 062d41a612e14a04b8be75834bba091a, type: 2}
@@ -4452,7 +4453,7 @@ MonoBehaviour:
       Height: 0.33
     Bottom:
       Radius: 4
-      Height: -1
+      Height: -1.35
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
@@ -4536,8 +4537,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1288116664}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.003815336, y: 0.18551594, z: 0.0007203149, w: 0.98263365}
-  m_LocalPosition: {x: 0, y: 1.7114573, z: -4.030341}
+  m_LocalRotation: {x: -0.011132735, y: 0.18550542, z: 0.0021018004, w: 0.982578}
+  m_LocalPosition: {x: 0, y: 1.6468488, z: -4.030341}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

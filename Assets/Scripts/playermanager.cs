@@ -203,6 +203,10 @@ public class playermanager : MonoBehaviour
             savedGains = new float[controllers.Count];
             for (int i = 0; i < controllers.Count; i++)
             {
+                if(fovroutine!= null)
+                {
+                    StopCoroutine(fovroutine);
+                }
                 savedGains[i] = controllers[i].Input.Gain;
                 if (controllers[i].Name == "Look Orbit X" || controllers[i].Name == "Look Orbit Y")
                     controllers[i].Input.Gain *= aim_sensi_multiplier;
