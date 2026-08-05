@@ -8,7 +8,7 @@ public class healthmanager : MonoBehaviour
     public Transform damagespawn;
     public GameObject damageprefab;
     public float health;
-    bool dead;
+    public bool dead;
     public Slider player_health;
     public TMP_Text player_health_text;
     void Start()
@@ -19,7 +19,7 @@ public class healthmanager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(health <= 0 && !dead)
+        if(health < 1 && !dead)
         {
             dead = true;
             if (!gameObject.CompareTag("Player"))
@@ -43,7 +43,7 @@ public class healthmanager : MonoBehaviour
             //text.transform.localRotation = Quaternion.LookRotation(GameObject.FindWithTag("Player").transform.position - text.transform.localPosition);
             if (health > 0)
             {
-                text.GetComponent<TextMeshPro>().text = health.ToString();
+                text.GetComponent<TextMeshPro>().text = health.ToString("F0");
             }
             else
             {

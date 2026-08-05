@@ -8,6 +8,7 @@ TagManager:
   - railgunbullet
   - FxTemporaire
   - ground
+  - scoremanager
   layers:
   - Default
   - TransparentFX

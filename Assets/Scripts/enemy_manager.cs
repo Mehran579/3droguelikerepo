@@ -20,7 +20,7 @@ public class enemy_manager : MonoBehaviour
         anim = GetComponent<Animator>();
         player = GameObject.FindWithTag("Player");
         myfollowpoint = player.transform.Find("way point "+Random.Range(0,5));
-        transform.rotation = Quaternion.LookRotation(player.transform.position);
+        //transform.rotation = Quaternion.LookRotation(player.transform.position);
     }
 
     // Update is called once per frame

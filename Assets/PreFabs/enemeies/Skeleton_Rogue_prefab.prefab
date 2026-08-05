@@ -722,6 +722,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: baa1cd87b49093c459ab3907025bc350, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1186550015575276869}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: baa1cd87b49093c459ab3907025bc350, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1161365647388121306}
     - targetCorrespondingSourceObject: {fileID: -7440837640338354081, guid: baa1cd87b49093c459ab3907025bc350, type: 3}
       insertIndex: -1
       addedObject: {fileID: 74135075796730900}
@@ -850,6 +853,9 @@ MonoBehaviour:
   damagespawn: {fileID: 1422549368999232708}
   damageprefab: {fileID: 6183539637084484095, guid: bce0a5b96a90e134c9d4b13054af5e73, type: 3}
   health: 5
+  dead: 0
+  player_health: {fileID: 0}
+  player_health_text: {fileID: 0}
 --- !u!54 &1747999278522612699
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -907,4 +913,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e09fd0aa033ded34f89f6ec5c8bf72bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  visible_Distance: 5
+  visible_Distance: 7
+--- !u!114 &1161365647388121306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9127858053580950080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d78e8554e25303419233d767cd1f820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::score_increaser
+  score_points: 15

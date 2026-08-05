@@ -36,6 +36,8 @@ public class playermanager : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         weapon1.SetActive(true);
         weapon2.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         //riflemuzzle.gameObject.SetActive(false);
     }
 
@@ -188,8 +190,14 @@ public class playermanager : MonoBehaviour
     public float aim_sensi_multiplier;
     public void OnAim(InputAction.CallbackContext context)
     {
-        if (knockedback) return;
         var controllers = inputAxisController.Controllers;
+        if (knockedback) 
+        {
+            cinecamera.Lens.FieldOfView = 80f;
+            for (int i = 0; i < controllers.Count; i++)
+                controllers[i].Input.Gain = savedGains[i];
+            return;
+        }
         if (context.performed)
         {
             savedGains = new float[controllers.Count];
@@ -361,6 +369,8 @@ public class playermanager : MonoBehaviour
         }
         if (Mouse.current.scroll.ReadValue() != Vector2.zero)
         {
+            if (firepressed) return;
+            if (holdingrailgun) return;
             if (weapon1.activeInHierarchy)
             {
                 weapon1.SetActive(false);
@@ -470,8 +480,18 @@ public class playermanager : MonoBehaviour
             //Debug.Log($"Hit: {hit.name}");
             //Debug.Log($"Attached RB: {hit.attachedRigidbody}");
             hitrb.AddExplosionForce(diveforce, transform.position, diveradius, 3f, ForceMode.Impulse);
-            if(hit.GetComponent<healthmanager>() != null)
-                hit.GetComponent<healthmanager>().takedamage(0.5f);
+            if (hit.GetComponent<healthmanager>() != null)
+                hit.GetComponent<healthmanager>().takedamage(Mathf.Lerp(9, 0.5f, Mathf.Clamp01(Vector3.Distance(transform.position, hit.transform.position) / 10)));
+
+                //if(Vector3.Distance(transform.position, hit.transform.position) < 10)
+                //{
+                //    hit.GetComponent<healthmanager>().takedamage(10-Vector3.Distance(transform.position, hit.transform.position));
+                //}
+                //else
+                //{
+                //    hit.GetComponent<healthmanager>().takedamage(0.5f);
+                //}
+            //Debug.Log($"distance: {Vector3.Distance(transform.position, hit.transform.position)}");
         }
         Expo.SetActive(true);
         expoimpact.transform.position = transform.position + new Vector3(0, 0.1f, 0);

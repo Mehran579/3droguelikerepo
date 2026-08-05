@@ -11,16 +11,22 @@ public class rogue : MonoBehaviour
     bool ishidden;
     void Start()
     {
+        ispawning = true;
         rends = GetComponentsInChildren<Renderer>();
         player = GameObject.FindWithTag("Player").transform;
+    }
+    bool ispawning;
+    public void spawnend()
+    {
+        ispawning = false;
         foreach (Renderer r in rends)
         {
             r.enabled = false;
         }
     }
-
     void Update()
     {
+        if (ispawning) return;
         if(GetComponent<healthmanager>().health <= 0)
         {
             foreach (Renderer r in rends)
