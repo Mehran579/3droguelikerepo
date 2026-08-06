@@ -267,7 +267,7 @@ public class playermanager : MonoBehaviour
         {
             railgunchargevfxobj.gameObject.SetActive(true);
             chargeVfxRoutine = StartCoroutine(railgunchargevfx());
-            speed *= 0.5f;
+            speed = 2.5f;
             holdingrailgun = true;
             anim.SetBool("aiming", true);
             if (chargeloop != null) StopCoroutine(chargeloop);
@@ -277,7 +277,7 @@ public class playermanager : MonoBehaviour
         {
             StopCoroutine(chargeVfxRoutine);
             railgunchargevfxobj.gameObject.SetActive(false);
-            speed *= 2;
+            speed = 5;
             holdingrailgun = false;
             anim.SetBool("aiming", false);
             if (chargeloop != null)
