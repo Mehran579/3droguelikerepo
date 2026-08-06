@@ -174,14 +174,16 @@ public class playermanager : MonoBehaviour
             dashdirection = (lockedr * MoveInput.x + lockedf * MoveInput.y).normalized;
         }
         rb.linearVelocity = new Vector3(dashdirection.x * dashvelocity, rb.linearVelocity.y, dashdirection.z * dashvelocity);
-        StartCoroutine(fovchanger(_dashzoomout, 30f));
+        if (fovroutine != null) StopCoroutine(fovroutine);
+        fovroutine = StartCoroutine(fovchanger(_dashzoomout, 30f));
         StartCoroutine(GetComponent<dashtrailplayer>().dashtrail(0.27f, 0.02f, dashmat));
         yield return new WaitForSeconds(dashtime);
         Physics.IgnoreLayerCollision(7, 6, false);
         rb.useGravity = true;
         isdashing = false;
         //cinecamera.Lens.FieldOfView = 80f;
-        StartCoroutine(fovchanger(80f, 30f));
+        if (fovroutine != null) StopCoroutine(fovroutine);
+        fovroutine = StartCoroutine(fovchanger(80f, 30f));
         yield return new WaitForSeconds(dashcooldown);
         candash = true;
     }
@@ -193,6 +195,11 @@ public class playermanager : MonoBehaviour
         var controllers = inputAxisController.Controllers;
         if (knockedback) 
         {
+            if (fovroutine != null)
+            {
+                StopCoroutine(fovroutine);
+                fovroutine = null;
+            }
             cinecamera.Lens.FieldOfView = 80f;
             for (int i = 0; i < controllers.Count; i++)
                 controllers[i].Input.Gain = savedGains[i];
